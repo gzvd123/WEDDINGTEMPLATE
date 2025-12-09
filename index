@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Cưới Hạnh Phúc | Văn Mạnh & Phương Anh</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        w: {
+                            gold: '#D4AF37',    
+                            red: '#A50021',     
+                            red_dark: '#7F0018',
+                            cream: '#FDFBF7',   
+                            cream_dark: '#F7F3E8', 
+                            text: '#3E2723',    
+                            gray: '#795548',     
+                        }
+                    },
+                    fontFamily: {
+                        script: ['"Pinyon Script"', 'cursive'], 
+                        serif: ['"Cormorant Garamond"', 'serif'], 
+                        sans: ['"Montserrat"', 'sans-serif'], 
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 30px -10px rgba(165, 0, 33, 0.1)',
+                        'card': '0 20px 40px -15px rgba(0,0,0,0.1)',
+                    },
+                    animation: {
+                        'heartbeat-slow': 'heartbeat 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        heartbeat: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.05)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CSS Base */
+        body {
+            background-color: #FDFBF7;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            color: #3E2723;
+        }
+
+        /* --- ENVELOPE STYLES (3D Center) --- */
+        #opening-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #FDFBF7 0%, #EFEBE0 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s ease-in-out, visibility 1.5s;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 340px;
+            height: 240px;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+
+        .envelope-wrapper:hover .envelope {
+            transform: translateY(-5px);
+        }
+
+        /* Nắp sau */
+        .env-back {
+            position: absolute;
+            bottom: 0; width: 100%; height: 100%;
+            background: #7F0018;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        /* Lá thư bên trong */
+        .letter-card {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 90%;
+            background: #fff;
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            border-radius: 6px;
+            z-index: 5;
+            transition: bottom 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s, transform 1s ease 0.6s;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        }
+
+        .letter-border {
+            border: 2px solid #D4AF37;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            outline: 1px dashed #D4AF37;
+            outline-offset: -6px;
+            opacity: 0;
+            transition: opacity 0.5s ease 1s;
+        }
+
+        /* Thân trước */
+        .env-front {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 10;
+            clip-path: polygon(0 100%, 100% 100%, 100% 40%, 50% 65%, 0 40%);
+            background: linear-gradient(135deg, #A50021 0%, #90001C 100%);
+            border-radius: 10px;
+        }
+        
+        .env-front::after {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        /* Nắp phong bì */
+        .env-lid {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 55%;
+            background: #B30024;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top;
+            transition: transform 0.6s ease-in-out, z-index 0s linear 0.3s;
+            z-index: 20;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Con dấu sáp */
+        .wax-seal {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px; height: 50px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #DAA520, #B8860B);
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 25;
+            display: flex; justify-content: center; align-items: center;
+            font-family: "Pinyon Script", cursive;
+            font-size: 24px; color: #57000F; font-weight: bold;
+            border: 2px solid #B8860B;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Animation States */
+        .open-anim .env-lid {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+        .open-anim .wax-seal {
+            opacity: 0; pointer-events: none;
+        }
+        .open-anim .letter-card {
+            bottom: 120px;
+            transform: translateX(-50%) scale(1.1);
+            z-index: 15;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        .open-anim .letter-border {
+            opacity: 1;
+        }
+        .fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Background Effects */
+        #canvas-stars, #canvas-hearts {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        #canvas-stars { z-index: 1; }
+        #canvas-hearts { z-index: 2; }
+        
+        .hero-section {
+            height: 100vh;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .gold-icon {
+            background: linear-gradient(45deg, #FDD835, #D4AF37, #FDD835);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        }
+        
+        /* Texture Overlay */
+        .texture-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            opacity: 0.3; pointer-events: none; z-index: 40;
+        }
+
+        /* Slider Scrollbar hidden */
+        #gallery-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="text-w-text antialiased relative overflow-hidden" id="main-body">
+
+    <div id="opening-overlay">
+        <p class="text-w-red/70 font-serif italic text-xl mb-8 animate-pulse">Chạm vào phong thư để mở</p>
+        <div class="envelope-wrapper animate-heartbeat-slow" id="btn-open-envelope">
+            <div class="envelope">
+                <div class="env-back"></div>
+                <div class="letter-card">
+                    <div class="letter-border">
+                        <p class="font-sans text-[10px] uppercase tracking-[0.2em] text-w-gray mb-1">Trân trọng kính mời</p>
+                        <h3 class="font-script text-3xl text-w-red my-2">Save The Date</h3>
+                        <div class="w-8 h-px bg-w-gold opacity-50 mb-2"></div>
+                        <p class="font-serif text-base italic text-w-text font-bold" id="letter-couple-name">Tên Cô Dâu & Chú Rể</p>
+                        <i class="fas fa-heart text-w-red mt-3 text-lg animate-bounce"></i>
+                    </div>
+                </div>
+                <div class="env-front"></div>
+                <div class="env-lid"></div>
+                <div class="wax-seal">DK<span class="text-xs">&</span>PA</div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="canvas-stars"></canvas>
+    <canvas id="canvas-hearts" class="opacity-0 transition-opacity duration-[2s]"></canvas>
+    <div class="texture-overlay"></div>
+
+    <script>
+        const weddingConfig = {
+            couple: {
+                groom: "Văn Mạnh",
+                bride: "Phương Anh",
+                date: "31/12/2025"
+            },
+            heroImage: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80", 
+            
+            // --- LOVE STORY DATA ---
+            story: {
+                title: "Câu chuyện tình yêu",
+                subtitle: "Từ người lạ thành “một nhà”",
+                desc: "Mỗi chặng đường đi qua đều là một kỷ niệm đẹp, và ngày cưới là khoảnh khắc chúng mình muốn lưu giữ cùng gia đình & bạn bè.",
+                content1: "Khánh & Anh gặp nhau vào một ngày rất đỗi bình thường, nhưng từ khoảnh khắc ấy, mọi thứ đã không còn “bình thường” nữa.",
+                content2: "Chúng mình đi cùng nhau qua những ngày nắng, ngày mưa, qua những bất ngờ và cả những điều tưởng chừng như không thể. Và rồi, chúng mình nhận ra: ở bên nhau chính là nhà.",
+                items: [
+                    { icon: "fa-infinity", title: "Tình yêu", text: "Là khi bình yên nhất vẫn muốn ở cạnh nhau, và trong những lúc khó khăn nhất cũng không buông tay." },
+                    { icon: "fa-users", title: "Gia đình", text: "Sự hiện diện của bạn sẽ làm ngày cưới của chúng mình trọn vẹn và ấm áp hơn rất nhiều." },
+                    { icon: "fa-home", title: "Khởi đầu", text: "Hôn lễ không chỉ là kết thúc của một hành trình yêu, mà còn là khởi đầu cho một chặng đường cùng nhau xây dựng tổ ấm." }
+                ]
+            },
+
+            family: {
+                groom: {
+                    father: "Ông Quách Văn A",
+                    mother: "Bà Nguyễn Thị B",
+                    address: "Số 17, Ngõ 111, Mạc Thị Bưởi, Nam Định",
+                    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80"
+                },
+                bride: {
+                    father: "Ông Phan Văn Sắc",
+                    mother: "Bà Nguyễn Thị Huyền",
+                    address: "Số 33g, Thôn Đức Trạch, Xã Thượng Phúc, Hà Nội",
+                    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80"
+                }
+            },
+            highlightPhotos: {
+                main: "https://images.unsplash.com/photo-1606800052052-a08af7148866",
+                sub1: "https://images.unsplash.com/photo-1507915977619-6ccfe8003ae6?auto=format&fit=crop&w=1920&q=80",
+                sub2: "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=800&q=80",
+                sub3: "https://i.pinimg.com/1200x/69/6e/40/696e40288349d2c68150b6427fb699c2.jpg"
+            },
+            events: {
+                vuquy: {
+                    title: "Lễ Vu Quy",
+                    time: "13:05", day: "31", month: "12", year: "2025", lunar: "12/11 Ất Tỵ",
+                    location: "Tư Gia Nhà Gái", address: "Số 33g, Thôn Đức Trạch, Xã Thượng Phúc, Hà Nội",
+                    mapLink: "https://goo.gl/maps"
+                },
+                thanhhon: {
+                    title: "Lễ Thành Hôn",
+                    time: "16:00", day: "31", month: "12", year: "2025", lunar: "12/11 Ất Tỵ",
+                    location: "Khách Sạn Vị Hoàng", address: "153 Nguyễn Du, Nam Định, Ninh Bình",
+                    mapLink: "https://goo.gl/maps"
+                }
+            },
+            // --- GALLERY SLIDER DATA ---
+            gallerySlide: [
+                "https://i.pinimg.com/736x/d6/2f/a9/d62fa9c5ce67dcfe4e1fffd745136d18.jpg",
+                "https://i.pinimg.com/1200x/cb/38/77/cb387711cc7c289f21886f47ff7ab263.jpg",
+                "https://i.pinimg.com/1200x/b3/ca/ad/b3caad59be8637ed599a65ff925020d0.jpg",
+                "https://i.pinimg.com/736x/27/52/d6/2752d6a519fce14d1aaa50fd2b8410ab.jpg",
+                "https://i.pinimg.com/736x/93/93/65/9393656917bc19d9ac195c3146a7f9b0.jpg",
+                "https://i.pinimg.com/1200x/1e/6a/44/1e6a44ed825831c29598f88371773d99.jpg",
+                "https://i.pinimg.com/1200x/b1/41/13/b1411349a6ad7dba8fdc98a1a3e260e5.jpg",
+                "https://i.pinimg.com/736x/3c/1b/c2/3c1bc245a615d1c81d9a795aedfddd6e.jpg",
+                "https://i.pinimg.com/736x/1a/0c/80/1a0c80b2a446343e44052c18defee1cc.jpg",
+                "https://i.pinimg.com/736x/14/94/4e/14944e774e22cefb105032f3514e7404.jpg",
+                "https://i.pinimg.com/1200x/86/9d/26/869d263315b8645809b3fd378d1423f1.jpg",
+                "https://i.pinimg.com/736x/f6/ea/d9/f6ead9a970cb89002a85448ee2e569be.jpg",
+                "https://i.pinimg.com/736x/5f/1e/2a/5f1e2a18512d3b6604d675ae9b336bd4.jpg",
+                "https://i.pinimg.com/736x/ac/2d/a0/ac2da03741e518a6b2bbd01f1bea5e74.jpg"
+            ],
+            bank: {
+                groom: { bankName: "Vietcombank", number: "1042104xxx", owner: "QUACH VAN MANH", qr: "https://img.vietqr.io/image/TCB-6999996669-compact2.jpg" },
+                bride: { bankName: "OCB", number: "0866216xxx", owner: "PHAN THI PHUONG ANH", qr: "https://img.vietqr.io/image/OCB-0866216xxx-compact2.jpg" }
+            },
+            music: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_c04f835075.mp3?filename=wedding-dream-118472.mp3"
+        };
+    </script>
+
+    <div id="music-control" class="fixed bottom-6 left-6 z-50 opacity-0 transition-opacity duration-[2s]">
+        <button id="musicToggle" class="w-12 h-12 bg-w-red/90 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-w-gold hover:scale-110 transition-all duration-300 animate-[spin_5s_linear_infinite]">
+            <i class="fas fa-compact-disc text-xl"></i>
+        </button>
+        <audio id="bgMusic" loop></audio>
+    </div>
+
+    <header class="hero-section flex items-center justify-center text-center text-white relative z-10" id="hero-bg">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
+        <div class="relative z-10 px-6 mt-16" data-aos="zoom-out" data-aos-duration="2000">
+            <div class="mb-6">
+                <i class="fas fa-crown gold-icon text-3xl mb-3"></i>
+                <p class="font-sans text-w-gold tracking-[0.4em] uppercase text-sm font-bold drop-shadow-sm">Save The Date</p>
+            </div>
+            
+            <h1 class="font-script text-7xl md:text-[9rem] mb-4 leading-none drop-shadow-lg text-w-cream">
+                <span id="hero-groom" class="block md:inline">Groom</span> 
+                <span class="text-w-gold text-4xl md:text-6xl align-middle mx-2 font-serif">&</span> 
+                <span id="hero-bride" class="block md:inline">Bride</span>
+            </h1>
+            
+            <div class="flex items-center justify-center gap-6 text-w-cream font-serif italic text-2xl mt-8">
+                <span class="border-t-2 border-w-gold w-12 opacity-80"></span>
+                <span id="hero-date" class="tracking-widest">Date</span>
+                <span class="border-t-2 border-w-gold w-12 opacity-80"></span>
+            </div>
+            
+            <div class="absolute bottom-10 left-0 w-full animate-bounce">
+                <p class="text-[10px] uppercase tracking-[0.2em] mb-2 opacity-80 font-sans">Kéo xuống để xem</p>
+                <i class="fas fa-chevron-down text-w-gold text-xl"></i>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-24 container mx-auto px-4 relative z-10 bg-w-cream rounded-t-[50px] -mt-[50px] shadow-[0_-20px_60px_rgba(165,0,33,0.15)]">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <p class="font-script text-5xl text-w-gold mb-2">Gia Đình Hai Bên</p>
+            <h2 class="font-serif text-4xl text-w-red font-bold uppercase tracking-wider">Trân trọng báo tin</h2>
+            <div class="w-16 h-1 bg-w-gold mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center max-w-5xl mx-auto">
+            <div class="text-center group" data-aos="fade-right">
+                <div class="relative w-64 h-64 mx-auto mb-8">
+                    <div class="absolute inset-0 border-2 border-w-gold rounded-full transform rotate-6 transition-transform group-hover:rotate-12 scale-105 opacity-60"></div>
+                    <img id="img-groom-fam" src="" class="w-full h-full object-cover rounded-full shadow-xl relative z-10 border-4 border-w-cream">
+                </div>
+                <h3 class="font-script text-5xl text-w-red mb-1" id="name-groom-main">Chú Rể</h3>
+                <p class="font-sans text-xs font-bold tracking-[0.3em] text-w-gold uppercase mb-6">Con trai trưởng</p>
+                
+                <div class="font-serif text-w-text text-lg space-y-2 bg-white p-6 rounded-2xl shadow-soft border border-w-gold/20 mx-4">
+                    <p class="border-b border-dashed border-w-gray/30 pb-2">Cha: <span id="father-groom" class="font-bold text-xl"></span></p>
+                    <p>Mẹ: <span id="mother-groom" class="font-bold text-xl"></span></p>
+                    <p class="text-sm text-w-gray mt-2 italic"><i class="fas fa-map-marker-alt text-w-red mr-1"></i><span id="addr-groom"></span></p>
+                </div>
+            </div>
+
+            <div class="text-center group" data-aos="fade-left">
+                <div class="relative w-64 h-64 mx-auto mb-8">
+                    <div class="absolute inset-0 border-2 border-w-gold rounded-full transform -rotate-6 transition-transform group-hover:-rotate-12 scale-105 opacity-60"></div>
+                    <img id="img-bride-fam" src="" class="w-full h-full object-cover rounded-full shadow-xl relative z-10 border-4 border-w-cream">
+                </div>
+                <h3 class="font-script text-5xl text-w-red mb-1" id="name-bride-main">Cô Dâu</h3>
+                <p class="font-sans text-xs font-bold tracking-[0.3em] text-w-gold uppercase mb-6">Con gái thứ</p>
+                
+                <div class="font-serif text-w-text text-lg space-y-2 bg-white p-6 rounded-2xl shadow-soft border border-w-gold/20 mx-4">
+                    <p class="border-b border-dashed border-w-gray/30 pb-2">Cha: <span id="father-bride" class="font-bold text-xl"></span></p>
+                    <p>Mẹ: <span id="mother-bride" class="font-bold text-xl"></span></p>
+                    <p class="text-sm text-w-gray mt-2 italic"><i class="fas fa-map-marker-alt text-w-red mr-1"></i><span id="addr-bride"></span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-white relative z-10 overflow-hidden" id="story">
+        <div class="absolute top-0 left-0 w-64 h-64 bg-w-red/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div class="absolute bottom-0 right-0 w-80 h-80 bg-w-gold/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
+
+        <div class="container mx-auto px-6 max-w-6xl relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="font-sans text-w-gray tracking-[0.2em] text-xs uppercase mb-2 font-semibold" id="story-subtitle">Love Story</p>
+                <h2 class="font-serif text-5xl text-w-red font-bold mb-4" id="story-title">Câu chuyện tình yêu</h2>
+                <p class="font-sans text-w-gray/80 max-w-2xl mx-auto italic leading-relaxed" id="story-desc">...</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="bg-w-cream p-8 md:p-10 rounded-2xl border border-w-gold/20 shadow-soft" data-aos="fade-right">
+                    <div class="font-serif text-w-text text-lg leading-loose space-y-4">
+                        <p id="story-content-1">...</p>
+                        <p id="story-content-2">...</p>
+                    </div>
+                    <div class="mt-6 text-sm text-w-gold italic font-serif text-right">
+                        — Khánh & Anh
+                    </div>
+                </div>
+                <div class="space-y-4" id="story-items-container">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-w-cream_dark relative z-10">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[600px]">
+                <div class="lg:col-span-7 h-[400px] lg:h-full relative group overflow-hidden rounded-[30px] shadow-2xl border-4 border-white" data-aos="fade-right">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 opacity-70"></div>
+                    <img id="photo-main" src="" class="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110">
+                    <div class="absolute bottom-8 left-8 z-20 text-w-cream">
+                        <p class="font-script text-6xl drop-shadow-lg mb-1">Hạnh phúc</p>
+                        <p class="font-sans text-xs tracking-[0.3em] uppercase ml-1 font-semibold">Là hành trình, không phải đích đến</p>
+                    </div>
+                </div>
+                <div class="lg:col-span-5 grid grid-rows-3 gap-4 h-full">
+                    <div class="relative overflow-hidden rounded-2xl shadow-lg border-2 border-white" data-aos="fade-left" data-aos-delay="100">
+                        <img id="photo-sub1" src="" class="w-full h-full object-cover hover:scale-110 transition duration-700">
+                    </div>
+                    <div class="row-span-2 grid grid-cols-2 gap-4">
+                        <div class="relative overflow-hidden rounded-2xl shadow-lg border-2 border-white" data-aos="fade-up" data-aos-delay="200">
+                            <img id="photo-sub2" src="" class="w-full h-full object-cover hover:scale-110 transition duration-700">
+                        </div>
+                        <div class="relative overflow-hidden rounded-2xl shadow-lg border-2 border-white" data-aos="fade-up" data-aos-delay="300">
+                            <img id="photo-sub3" src="" class="w-full h-full object-cover hover:scale-110 transition duration-700">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="event" class="py-24 bg-white relative z-10">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <div class="text-center mb-16" data-aos="zoom-in">
+                <p class="font-sans text-w-gray tracking-[0.3em] uppercase text-xs mb-3 font-semibold">Timeline</p>
+                <h2 class="font-serif text-5xl text-w-red font-bold">Sự Kiện Cưới</h2>
+                <div class="w-16 h-1 bg-w-gold mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                
+                <div class="bg-white rounded-2xl shadow-lg border border-w-gold/20 overflow-hidden hover:-translate-y-2 transition duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-w-red p-6 text-center text-white">
+                        <h3 class="font-serif text-2xl font-bold uppercase" id="vuquy-title">LỄ VU QUY</h3>
+                    </div>
+                    <div class="p-8 text-center">
+                        <p class="text-5xl font-serif font-bold text-w-text mb-2" id="vuquy-time">00:00</p>
+                        <p class="font-sans text-xs uppercase tracking-widest text-w-gray mb-4" id="vuquy-date">DD/MM/YYYY</p>
+                        <div class="h-px w-full bg-w-gold/30 mb-6"></div>
+                        <p class="font-bold text-lg text-w-red mb-2" id="vuquy-loc">Location</p>
+                        <p class="text-sm text-w-gray mb-6 leading-relaxed px-4" id="vuquy-addr">Address</p>
+                        <a id="vuquy-map" href="#" target="_blank" class="inline-block px-6 py-2 border border-w-red text-w-red rounded-full hover:bg-w-red hover:text-white transition-all text-xs font-bold uppercase tracking-wider">
+                            Xem bản đồ
+                        </a>
+                    </div>
+                </div>
+
+                <div class="z-20 transform md:-translate-y-8" data-aos="zoom-in" data-aos-duration="1000">
+                    <div class="bg-white rounded-2xl shadow-2xl border-2 border-w-gold/40 p-1">
+                        <div class="bg-w-cream_dark rounded-[20px] p-6 text-center border border-dashed border-w-gold/30">
+                            <p class="font-script text-5xl mb-1 text-w-gold">Tháng 12</p>
+                            <p class="font-sans text-[10px] tracking-[0.4em] font-bold text-w-text mb-6">HAI NGÀN HAI MƯƠI LĂM</p>
+                            
+                            <div class="grid grid-cols-7 gap-1 font-serif text-w-text mb-6">
+                                <div class="text-xs text-w-gold font-bold mb-2">CN</div><div class="text-xs text-w-gold font-bold mb-2">T2</div><div class="text-xs text-w-gold font-bold mb-2">T3</div><div class="text-xs text-w-gold font-bold mb-2">T4</div><div class="text-xs text-w-gold font-bold mb-2">T5</div><div class="text-xs text-w-gold font-bold mb-2">T6</div><div class="text-xs text-w-gold font-bold mb-2">T7</div>
+                                <div></div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+                                <div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div>
+                                <div>14</div><div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div>
+                                <div>21</div><div>22</div><div>23</div><div>24</div><div>25</div><div>26</div><div>27</div>
+                                <div>28</div><div>29</div><div>30</div>
+                                <div class="relative flex items-center justify-center">
+                                    <span class="w-8 h-8 bg-w-red text-white rounded-full flex items-center justify-center shadow-md font-bold text-sm z-10">31</span>
+                                    <i class="fas fa-heart absolute -top-1 -right-1 text-w-gold text-xs animate-bounce"></i>
+                                </div>
+                                <div></div><div></div>
+                            </div>
+                            <p class="font-script text-3xl text-w-red">Save our date</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-w-gold/20 overflow-hidden hover:-translate-y-2 transition duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-w-red p-6 text-center text-white">
+                        <h3 class="font-serif text-2xl font-bold uppercase" id="thanhhon-title">LỄ THÀNH HÔN</h3>
+                    </div>
+                    <div class="p-8 text-center">
+                        <p class="text-5xl font-serif font-bold text-w-text mb-2" id="thanhhon-time">00:00</p>
+                        <p class="font-sans text-xs uppercase tracking-widest text-w-gray mb-4" id="thanhhon-date">DD/MM/YYYY</p>
+                        <div class="h-px w-full bg-w-gold/30 mb-6"></div>
+                        <p class="font-bold text-lg text-w-red mb-2" id="thanhhon-loc">Location</p>
+                        <p class="text-sm text-w-gray mb-6 leading-relaxed px-4" id="thanhhon-addr">Address</p>
+                        <a id="thanhhon-map" href="#" target="_blank" class="inline-block px-6 py-2 border border-w-red text-w-red rounded-full hover:bg-w-red hover:text-white transition-all text-xs font-bold uppercase tracking-wider">
+                            Xem bản đồ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-w-cream overflow-hidden relative z-20 border-t border-w-gold/10">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 pointer-events-none"></div>
+
+        <div class="container mx-auto px-4 mb-10 text-center" data-aos="fade-up">
+            <p class="font-sans text-w-gray tracking-[0.3em] uppercase text-xs mb-3 font-semibold">Memories</p>
+            <h2 class="font-serif text-5xl text-w-red font-bold">Album Hạnh Phúc</h2>
+            <div class="w-16 h-1 bg-w-gold mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="relative w-full" data-aos="fade-up" data-aos-delay="200">
+            <button onclick="scrollGallery(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-white/80 hover:bg-white text-w-red rounded-full shadow-lg flex items-center justify-center transition hover:scale-110 backdrop-blur-sm">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button onclick="scrollGallery(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-white/80 hover:bg-white text-w-red rounded-full shadow-lg flex items-center justify-center transition hover:scale-110 backdrop-blur-sm">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div id="gallery-scroll" class="flex gap-6 overflow-x-auto scroll-smooth px-8 pb-10 snap-x snap-mandatory no-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
+                </div>
+            
+            <div class="absolute bottom-0 left-0 w-full h-4 bg-w-gold/10 border-t border-w-gold/20"></div>
+            <div class="absolute top-0 left-0 w-full h-4 bg-w-gold/10 border-b border-w-gold/20"></div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-white relative z-10" id="wishes">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <i class="fas fa-gift text-w-gold text-4xl mb-4 animate-bounce"></i>
+                <h2 class="font-serif text-5xl text-w-red mb-2 font-bold">Hộp Mừng Cưới</h2>
+                <p class="font-sans text-w-gray text-sm italic">Gửi trọn yêu thương đến đôi uyên ương</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8 justify-center">
+                <div class="flex-1 bg-white rounded-2xl p-8 text-center shadow-lg border border-w-gold/10" data-aos="flip-left">
+                    <h4 class="font-serif text-2xl font-bold text-w-red mb-6">Mừng Chú Rể</h4>
+                    <div class="aspect-square w-48 mx-auto mb-6 rounded-xl overflow-hidden border-2 border-w-gold/30 p-2 bg-white">
+                        <img id="qr-groom" src="" class="w-full h-full object-contain rounded-lg">
+                    </div>
+                    <p class="font-bold text-w-text text-lg mb-1" id="bank-groom-name">Bank</p>
+                    <p class="font-mono text-xl text-w-red py-1 font-bold tracking-wider" id="bank-groom-num">0000</p>
+                    <p class="text-sm text-w-gray mb-6 italic" id="bank-groom-owner">Owner</p>
+                    <button onclick="copyToClipboard('bank-groom-num')" class="bg-w-red hover:bg-w-red_dark text-white px-6 py-2 rounded-full text-xs font-bold transition flex items-center justify-center mx-auto gap-2 shadow-md uppercase tracking-wide">
+                        <i class="far fa-copy"></i> Sao chép STK
+                    </button>
+                </div>
+
+                <div class="flex-1 bg-white rounded-2xl p-8 text-center shadow-lg border border-w-gold/10" data-aos="flip-right">
+                    <h4 class="font-serif text-2xl font-bold text-w-red mb-6">Mừng Cô Dâu</h4>
+                    <div class="aspect-square w-48 mx-auto mb-6 rounded-xl overflow-hidden border-2 border-w-gold/30 p-2 bg-white">
+                        <img id="qr-bride" src="" class="w-full h-full object-contain rounded-lg">
+                    </div>
+                    <p class="font-bold text-w-text text-lg mb-1" id="bank-bride-name">Bank</p>
+                    <p class="font-mono text-xl text-w-red py-1 font-bold tracking-wider" id="bank-bride-num">0000</p>
+                    <p class="text-sm text-w-gray mb-6 italic" id="bank-bride-owner">Owner</p>
+                    <button onclick="copyToClipboard('bank-bride-num')" class="bg-w-red hover:bg-w-red_dark text-white px-6 py-2 rounded-full text-xs font-bold transition flex items-center justify-center mx-auto gap-2 shadow-md uppercase tracking-wide">
+                        <i class="far fa-copy"></i> Sao chép STK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-w-red_dark text-w-cream py-16 text-center relative z-10 overflow-hidden">
+        <h2 class="font-script text-7xl mb-6 relative z-10 drop-shadow-md">Thank You!</h2>
+        <p class="font-sans text-sm opacity-90 max-w-md mx-auto leading-relaxed relative z-10 px-6">
+            Sự hiện diện của quý khách là niềm vinh hạnh lớn nhất đối với gia đình chúng tôi.
+        </p>
+        <div class="mt-10 text-w-gold text-2xl space-x-4 relative z-10 animate-pulse">
+            <i class="fas fa-heart"></i>
+        </div>
+        <p class="font-sans text-[10px] mt-8 opacity-60 relative z-10 tracking-widest">© 2025 Văn Mạnh & Phương Anh</p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // AOS Init
+        AOS.init({ once: false, mirror: true, duration: 1000, offset: 50, easing: 'ease-out-cubic' });
+
+        // Load Data
+        document.addEventListener("DOMContentLoaded", function() {
+            // Disable scroll initially
+            document.body.style.overflow = 'hidden';
+            window.scrollTo(0, 0);
+
+            // --- HERO ---
+            document.getElementById('hero-bg').style.backgroundImage = `url('${weddingConfig.heroImage}')`;
+            document.getElementById('hero-groom').textContent = weddingConfig.couple.groom;
+            document.getElementById('hero-bride').textContent = weddingConfig.couple.bride;
+            document.getElementById('hero-date').textContent = weddingConfig.couple.date.split('/').join(' . ');
+            
+            // Envelope Data
+            document.getElementById('letter-couple-name').textContent = `${weddingConfig.couple.groom} & ${weddingConfig.couple.bride}`;
+
+            // --- FAMILY ---
+            // Groom
+            document.getElementById('img-groom-fam').src = weddingConfig.family.groom.image;
+            document.getElementById('father-groom').textContent = weddingConfig.family.groom.father;
+            document.getElementById('mother-groom').textContent = weddingConfig.family.groom.mother;
+            document.getElementById('addr-groom').textContent = weddingConfig.family.groom.address;
+            document.getElementById('name-groom-main').textContent = weddingConfig.couple.groom;
+            // Bride
+            document.getElementById('img-bride-fam').src = weddingConfig.family.bride.image;
+            document.getElementById('father-bride').textContent = weddingConfig.family.bride.father;
+            document.getElementById('mother-bride').textContent = weddingConfig.family.bride.mother;
+            document.getElementById('addr-bride').textContent = weddingConfig.family.bride.address;
+            document.getElementById('name-bride-main').textContent = weddingConfig.couple.bride;
+
+            // --- LOVE STORY ---
+            document.getElementById('story-subtitle').textContent = weddingConfig.story.subtitle;
+            document.getElementById('story-title').textContent = weddingConfig.story.title;
+            document.getElementById('story-desc').textContent = weddingConfig.story.desc;
+            document.getElementById('story-content-1').textContent = weddingConfig.story.content1;
+            document.getElementById('story-content-2').textContent = weddingConfig.story.content2;
+
+            const storyContainer = document.getElementById('story-items-container');
+            weddingConfig.story.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-white/80 p-4 rounded-xl border border-dashed border-w-red/20 flex gap-4 items-start hover:bg-white transition";
+                div.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-w-red/5 flex items-center justify-center shrink-0 text-w-red">
+                        <i class="fas ${item.icon} text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-w-text text-sm mb-1 font-sans uppercase tracking-wide">${item.title}</h4>
+                        <p class="text-xs text-w-gray leading-relaxed">${item.text}</p>
+                    </div>
+                `;
+                storyContainer.appendChild(div);
+            });
+
+            // --- PHOTOS ---
+            document.getElementById('photo-main').src = weddingConfig.highlightPhotos.main;
+            document.getElementById('photo-sub1').src = weddingConfig.highlightPhotos.sub1;
+            document.getElementById('photo-sub2').src = weddingConfig.highlightPhotos.sub2;
+            document.getElementById('photo-sub3').src = weddingConfig.highlightPhotos.sub3;
+
+            // --- EVENTS ---
+            // Vu Quy
+            document.getElementById('vuquy-title').textContent = weddingConfig.events.vuquy.title;
+            document.getElementById('vuquy-time').textContent = weddingConfig.events.vuquy.time;
+            document.getElementById('vuquy-date').textContent = `${weddingConfig.events.vuquy.day}/${weddingConfig.events.vuquy.month}/${weddingConfig.events.vuquy.year}`;
+            document.getElementById('vuquy-loc').textContent = weddingConfig.events.vuquy.location;
+            document.getElementById('vuquy-addr').textContent = weddingConfig.events.vuquy.address;
+            document.getElementById('vuquy-map').href = weddingConfig.events.vuquy.mapLink;
+            // Thanh Hon
+            document.getElementById('thanhhon-title').textContent = weddingConfig.events.thanhhon.title;
+            document.getElementById('thanhhon-time').textContent = weddingConfig.events.thanhhon.time;
+            document.getElementById('thanhhon-date').textContent = `${weddingConfig.events.thanhhon.day}/${weddingConfig.events.thanhhon.month}/${weddingConfig.events.thanhhon.year}`;
+            document.getElementById('thanhhon-loc').textContent = weddingConfig.events.thanhhon.location;
+            document.getElementById('thanhhon-addr').textContent = weddingConfig.events.thanhhon.address;
+            document.getElementById('thanhhon-map').href = weddingConfig.events.thanhhon.mapLink;
+
+            // --- BANK ---
+            const gBank = weddingConfig.bank.groom;
+            document.getElementById('qr-groom').src = gBank.qr;
+            document.getElementById('bank-groom-name').textContent = gBank.bankName;
+            document.getElementById('bank-groom-num').textContent = gBank.number;
+            document.getElementById('bank-groom-owner').textContent = gBank.owner;
+            const bBank = weddingConfig.bank.bride;
+            document.getElementById('qr-bride').src = bBank.qr;
+            document.getElementById('bank-bride-name').textContent = bBank.bankName;
+            document.getElementById('bank-bride-num').textContent = bBank.number;
+            document.getElementById('bank-bride-owner').textContent = bBank.owner;
+
+            // --- RENDER GALLERY SLIDER ---
+            const galleryContainer = document.getElementById('gallery-scroll');
+            if(weddingConfig.gallerySlide && weddingConfig.gallerySlide.length > 0) {
+                weddingConfig.gallerySlide.forEach((imgUrl) => {
+                    const slideItem = document.createElement('div');
+                    slideItem.className = "flex-none w-[300px] h-[400px] md:w-[350px] md:h-[450px] relative rounded-2xl overflow-hidden shadow-lg border-4 border-white snap-center group transition-all duration-500 hover:scale-[1.02] cursor-pointer";
+                    slideItem.innerHTML = `
+                        <img src="${imgUrl}" class="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" loading="lazy">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                        <div class="absolute bottom-4 left-4 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-md">
+                            <i class="fas fa-heart text-w-gold"></i>
+                        </div>
+                    `;
+                    galleryContainer.appendChild(slideItem);
+                });
+            }
+
+            // Audio
+            document.getElementById('bgMusic').src = weddingConfig.music;
+        });
+
+        // --- ENVELOPE OPENING LOGIC ---
+        function openEnvelope() {
+            const overlay = document.getElementById('opening-overlay');
+            const musicControl = document.getElementById('music-control');
+            const heartsCanvas = document.getElementById('canvas-hearts');
+            const audio = document.getElementById('bgMusic');
+            const btn = document.getElementById('btn-open-envelope');
+
+            btn.classList.remove('animate-heartbeat-slow');
+            overlay.classList.add('open-anim');
+
+            // Play Music
+            audio.play().then(() => {
+                musicControl.classList.remove('opacity-0');
+            }).catch(e => console.log("Audio play error", e));
+
+            // Confetti
+            setTimeout(() => {
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.7 },
+                    colors: ['#D4AF37', '#A50021', '#FDFBF7'],
+                    disableForReducedMotion: true
+                });
+            }, 800);
+
+            // Finish
+            setTimeout(() => {
+                overlay.classList.add('fade-out');
+                document.body.style.overflow = 'auto'; 
+                heartsCanvas.classList.remove('opacity-0');
+                AOS.refresh(); 
+                initStars();
+                animateStars();
+            }, 2500);
+        }
+
+        // --- GALLERY SCROLL LOGIC ---
+        function scrollGallery(direction) {
+            const container = document.getElementById('gallery-scroll');
+            const scrollAmount = 320;
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        let autoScrollInterval;
+        const galleryScroll = document.getElementById('gallery-scroll');
+        function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+                if (galleryScroll.scrollLeft + galleryScroll.clientWidth >= galleryScroll.scrollWidth - 10) {
+                     galleryScroll.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                     galleryScroll.scrollBy({ left: 320, behavior: 'smooth' });
+                }
+            }, 3000);
+        }
+        function stopAutoScroll() { clearInterval(autoScrollInterval); }
+
+        if(galleryScroll) {
+            startAutoScroll();
+            galleryScroll.addEventListener('mouseenter', stopAutoScroll);
+            galleryScroll.addEventListener('mouseleave', startAutoScroll);
+            galleryScroll.addEventListener('touchstart', stopAutoScroll);
+        }
+
+        // --- MUSIC BUTTON ---
+        const musicBtn = document.getElementById('musicToggle');
+        const audio = document.getElementById('bgMusic');
+        let isPlaying = true; 
+
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(isPlaying) {
+                audio.pause();
+                musicBtn.classList.remove('animate-[spin_5s_linear_infinite]');
+                musicBtn.innerHTML = '<i class="fas fa-volume-mute text-xl"></i>';
+            } else {
+                audio.play();
+                musicBtn.classList.add('animate-[spin_5s_linear_infinite]');
+                musicBtn.innerHTML = '<i class="fas fa-compact-disc text-xl"></i>';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        document.getElementById('btn-open-envelope').addEventListener('click', openEnvelope);
+
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            alert("Đã sao chép số tài khoản: " + text + "\nChúc mừng hạnh phúc hai bạn!");
+        }
+
+        // --- CANVAS EFFECTS ---
+        const canvasHearts = document.getElementById('canvas-hearts');
+        const ctxHearts = canvasHearts.getContext('2d');
+        const canvasStars = document.getElementById('canvas-stars');
+        const ctxStars = canvasStars.getContext('2d');
+        
+        let canvasWidth, canvasHeight;
+        let hearts = [], stars = [];
+
+        function resize() { 
+            canvasWidth = canvasHearts.width = canvasStars.width = window.innerWidth; 
+            canvasHeight = canvasHearts.height = canvasStars.height = window.innerHeight; 
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Heart {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvasWidth;
+                this.y = Math.random() * -canvasHeight;
+                this.size = Math.random() * 5 + 3;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.3 + 0.1;
+                this.rotation = Math.random() * Math.PI * 2;
+            }
+            update() {
+                this.y += this.speed;
+                this.rotation += 0.01;
+                if(this.y > canvasHeight) this.reset();
+            }
+            draw() {
+                ctxHearts.save();
+                ctxHearts.translate(this.x, this.y);
+                ctxHearts.rotate(this.rotation);
+                ctxHearts.fillStyle = `rgba(165, 0, 33, ${this.opacity})`;
+                ctxHearts.beginPath();
+                const topCurveHeight = this.size * 0.3;
+                ctxHearts.moveTo(0, topCurveHeight);
+                ctxHearts.bezierCurveTo(0, 0, -this.size / 2, 0, -this.size / 2, topCurveHeight);
+                ctxHearts.bezierCurveTo(-this.size / 2, (this.size + topCurveHeight) / 2, 0, this.size, 0, this.size);
+                ctxHearts.bezierCurveTo(0, this.size, this.size / 2, (this.size + topCurveHeight) / 2, this.size / 2, topCurveHeight);
+                ctxHearts.bezierCurveTo(this.size / 2, 0, 0, 0, 0, topCurveHeight);
+                ctxHearts.fill();
+                ctxHearts.restore();
+            }
+        }
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvasWidth;
+                this.y = Math.random() * canvasHeight;
+                this.size = Math.random() * 2 + 0.5;
+                this.maxOpacity = Math.random() * 0.6 + 0.2;
+                this.opacity = Math.random() * this.maxOpacity;
+                this.speed = Math.random() * 0.02 + 0.005;
+                this.growing = Math.random() > 0.5;
+                this.color = Math.random() > 0.7 ? '#D4AF37' : '#FFFFFF'; 
+            }
+            update() {
+                if (this.growing) {
+                    this.opacity += this.speed;
+                    if (this.opacity >= this.maxOpacity) this.growing = false;
+                } else {
+                    this.opacity -= this.speed;
+                    if (this.opacity <= 0.1) {
+                        this.growing = true;
+                        this.x = Math.random() * canvasWidth;
+                        this.y = Math.random() * canvasHeight;
+                    }
+                }
+            }
+            draw() {
+                ctxStars.fillStyle = this.color;
+                ctxStars.globalAlpha = this.opacity;
+                ctxStars.beginPath();
+                ctxStars.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctxStars.fill();
+            }
+        }
+
+        for(let i=0; i<30; i++) hearts.push(new Heart());
+        function initStars() { for(let i=0; i<60; i++) stars.push(new Star()); }
+
+        function animateStars() {
+            ctxStars.clearRect(0, 0, canvasWidth, canvasHeight);
+            stars.forEach(s => { s.update(); s.draw(); });
+            requestAnimationFrame(animateStars);
+        }
+        function animateHearts() {
+            ctxHearts.clearRect(0, 0, canvasWidth, canvasHeight);
+            hearts.forEach(h => { h.update(); h.draw(); });
+            requestAnimationFrame(animateHearts);
+        }
+        animateHearts();
+    </script>
+</body>
+</html>
